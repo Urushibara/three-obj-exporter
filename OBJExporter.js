@@ -1,3 +1,5 @@
+var THREE = require('three')
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */

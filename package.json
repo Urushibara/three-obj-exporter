@@ -1,6 +1,6 @@
 {
   "name": "three-obj-exporter-t",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "homepage": "https://github.com/cs64188/three-obj-exporter",
   "description": "threejs offical apply obj-exporter.js with npm",
   "main": "OBJExporter.js",
