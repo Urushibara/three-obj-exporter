@@ -1,0 +1,26 @@
+{
+  "name": "three-obj-exporter",
+  "version": "1.0.0",
+  "homepage": "https://github.com/cs64188/three-obj-exporter",
+  "description": "threejs offical apply obj-exporter.js with npm",
+  "main": "OBJExporter.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "peerDependencies": {
+    "three": ">= 0.91"
+  },
+  "keywords": [
+    "objexporter",
+    "OBJExporter",
+    "three-obj-exporter",
+    "threejs",
+    "three.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cs64188/three-obj-exporter.git"
+  },
+  "author": "tomyl",
+  "license": "MIT"
+}
