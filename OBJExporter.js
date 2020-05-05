@@ -1,7 +1,7 @@
-var THREE = require('three')
-
 /**
- * @author mrdoob / http://mrdoob.com/
+ * Original: @author mrdoob / http://mrdoob.com/
+ *
+ * + Supports multiple materials by Urushibara
  */
 
 THREE.OBJExporter = function () {};
@@ -46,6 +46,7 @@ THREE.OBJExporter.prototype = {
 				var vertices = geometry.getAttribute( 'position' );
 				var normals = geometry.getAttribute( 'normal' );
 				var uvs = geometry.getAttribute( 'uv' );
+				var groups = geometry.groups;
 				var indices = geometry.getIndex();
 
 				// name of the mesh object
@@ -120,6 +121,8 @@ THREE.OBJExporter.prototype = {
 
 				if ( indices !== null ) {
 
+					let group_index = 0
+
 					for ( i = 0, l = indices.count; i < l; i += 3 ) {
 
 						for ( m = 0; m < 3; m ++ ) {
@@ -130,12 +133,23 @@ THREE.OBJExporter.prototype = {
 
 						}
 
+						// multiple material support
+						if (groups && groups[ group_index ] && groups[ group_index ].start == i){
+
+							output += 'usemtl ' + mesh.material[ groups[ group_index ].materialIndex ].name + '\n';
+
+							++ group_index
+
+						}
+
 						// transform the face to export format
 						output += 'f ' + face.join( ' ' ) + "\n";
 
 					}
 
 				} else {
+
+					let group_index = 0
 
 					for ( i = 0, l = vertices.count; i < l; i += 3 ) {
 
@@ -144,6 +158,15 @@ THREE.OBJExporter.prototype = {
 							j = i + m + 1;
 
 							face[ m ] = ( indexVertex + j ) + ( normals || uvs ? '/' + ( uvs ? ( indexVertexUvs + j ) : '' ) + ( normals ? '/' + ( indexNormals + j ) : '' ) : '' );
+
+						}
+
+						// multiple material support
+						if (groups && groups[ group_index ] && groups[ group_index ].start == i){
+
+							output += 'usemtl ' + mesh.material[ groups[ group_index ].materialIndex ].name + '\n';
+
+							++ group_index
 
 						}
 
@@ -262,5 +285,3 @@ THREE.OBJExporter.prototype = {
 	}
 
 };
-
-exports.OBJExporter = THREE.OBJExporter;
