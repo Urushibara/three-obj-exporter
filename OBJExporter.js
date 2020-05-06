@@ -53,9 +53,17 @@ THREE.OBJExporter.prototype = {
 				output += 'o ' + mesh.name + '\n';
 
 				// name of the mesh material
-				if ( mesh.material && mesh.material.name ) {
+				if ( mesh.material ) {
 
-					output += 'usemtl ' + mesh.material.name + '\n';
+					if( mesh.material.name ) {
+
+						output += 'usemtl ' + mesh.material.name + '\n';
+
+					} else {
+
+						output += 'usemtl ' + "0" + '\n';
+
+					}
 
 				}
 
@@ -134,9 +142,17 @@ THREE.OBJExporter.prototype = {
 						}
 
 						// multiple material support
-						if (groups && groups[ group_index ] && groups[ group_index ].start == i){
+						if (groups && groups[ group_index ] && groups[ group_index ].start == i && mesh.material[ groups[ group_index ].materialIndex ]){
 
-							output += 'usemtl ' + mesh.material[ groups[ group_index ].materialIndex ].name + '\n';
+							if (mesh.material[ groups[ group_index ].materialIndex ].hasOwnProperty("name")) {
+
+								output += 'usemtl ' + mesh.material[ groups[ group_index ].materialIndex ].name + '\n';
+
+							} else {
+
+								output += 'usemtl ' + groups[ group_index ].materialIndex + '\n';
+
+							}
 
 							++ group_index
 
@@ -162,9 +178,16 @@ THREE.OBJExporter.prototype = {
 						}
 
 						// multiple material support
-						if (groups && groups[ group_index ] && groups[ group_index ].start == i){
+						if (groups && groups[ group_index ] && groups[ group_index ].start == i && mesh.material[ groups[ group_index ].materialIndex ]){
 
-							output += 'usemtl ' + mesh.material[ groups[ group_index ].materialIndex ].name + '\n';
+							if (mesh.material[ groups[ group_index ].materialIndex ].hasOwnProperty("name")) {
+
+								output += 'usemtl ' + mesh.material[ groups[ group_index ].materialIndex ].name + '\n';
+
+							} else {
+								output += 'usemtl ' + groups[ group_index ].materialIndex + '\n';
+
+							}
 
 							++ group_index
 
