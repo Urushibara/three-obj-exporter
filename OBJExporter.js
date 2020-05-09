@@ -4,7 +4,9 @@
  * + Supports multiple materials by Urushibara
  */
 
-THREE.OBJExporter = function () {};
+THREE.OBJExporter = function () {
+	this.materials = {}
+}
 
 THREE.OBJExporter.prototype = {
 
@@ -59,9 +61,13 @@ THREE.OBJExporter.prototype = {
 
 						output += 'usemtl ' + mesh.material.name + '\n';
 
+						this.materials[ mesh.material.name ] = mesh.material;
+
 					} else {
 
-						output += 'usemtl ' + "0" + '\n';
+						output += 'usemtl ' + mesh.material.id + '\n';
+
+						this.materials[ mesh.material.id ] = mesh.material;
 
 					}
 
@@ -147,10 +153,14 @@ THREE.OBJExporter.prototype = {
 							if (mesh.material[ groups[ group_index ].materialIndex ].hasOwnProperty("name")) {
 
 								output += 'usemtl ' + mesh.material[ groups[ group_index ].materialIndex ].name + '\n';
+								
+								this.materials[ mesh.material[ groups[ group_index ].materialIndex ].name ] = mesh.material[ groups[ group_index ].materialIndex ];
 
 							} else {
 
 								output += 'usemtl ' + groups[ group_index ].materialIndex + '\n';
+
+								this.materials[ groups[ group_index ].materialIndex ] = mesh.material[ groups[ group_index ].materialIndex ];
 
 							}
 
@@ -183,9 +193,14 @@ THREE.OBJExporter.prototype = {
 							if (mesh.material[ groups[ group_index ].materialIndex ].hasOwnProperty("name")) {
 
 								output += 'usemtl ' + mesh.material[ groups[ group_index ].materialIndex ].name + '\n';
+								
+								this.materials[ mesh.material[ groups[ group_index ].materialIndex ].name ] = mesh.material[ groups[ group_index ].materialIndex ];
 
 							} else {
+
 								output += 'usemtl ' + groups[ group_index ].materialIndex + '\n';
+
+								this.materials[ groups[ group_index ].materialIndex ] = mesh.material[ groups[ group_index ].materialIndex ];
 
 							}
 
@@ -287,21 +302,292 @@ THREE.OBJExporter.prototype = {
 
 		};
 
+		let self = this
+
 		object.traverse( function ( child ) {
 
 			if ( child instanceof THREE.Mesh ) {
 
-				parseMesh( child );
+				parseMesh.call( self, child );
 
 			}
 
 			if ( child instanceof THREE.Line ) {
 
-				parseLine( child );
+				parseLine.call( self, child );
 
 			}
 
 		} );
+
+		return output;
+
+	},
+
+	// for MTL --------------------------------------------------------------------------
+	generate_mtl: function(){
+
+		var output = "";
+
+		Object.keys( this.materials ).forEach( name => {
+
+			output += "newmtl " + name + "\n";
+
+			if ( this.materials[ name ].color && !this.materials[ name ].color.equals(new THREE.Color(1, 1, 1)) ) {
+
+				output += "Ka " + this.materials[ name ].color.r + " " + this.materials[ name ].color.g + " " + this.materials[ name ].color.b + "\n";
+
+			}
+
+			if ( this.materials[ name ].specular ) {
+
+				output += "Ks " + this.materials[ name ].specular.r + " " + this.materials[ name ].specular.g + " " + this.materials[ name ].specular.b + "\n";
+
+			}
+
+			if ( this.materials[ name ].emissive && !this.materials[ name ].emissive.equals(new THREE.Color(0, 0, 0)) ) {
+
+				output += "Ke " + 
+					( this.materials[ name ].emissive.r * this.materials[ name ].emissiveIntensity ) + " " + 
+					( this.materials[ name ].emissive.g * this.materials[ name ].emissiveIntensity ) + " " + 
+					( this.materials[ name ].emissive.b * this.materials[ name ].emissiveIntensity ) + "\n";
+
+			}
+			
+			if ( this.materials[ name ].opacity < 1 ) {
+
+				output += "d " + this.materials[ name ].opacity + "\n";
+
+			}
+
+			if ( this.materials[ name ].map ) {
+
+				output += "map_Kd ";
+
+				if ( this.materials[ name ].map.name ) {
+
+					output += this.materials[ name ].map.name + "\n";
+				
+				}
+				
+				// if used TextureLoader
+				else if ( this.materials[ name ].map.image && this.materials[ name ].map.image.src ) {
+
+					// parse filename
+					var filename = this.materials[ name ].map.image.src.match( ".+/(.+?)([\?#;].*)?$" )
+
+					if ( filename ) {
+
+						// has path ?
+						if ( filename.length > 1 ) {
+
+							output += filename[1] + "\n";
+
+						} else {
+
+							output += filename[0] + "\n";
+
+						}
+
+					} else {
+
+						// default temporary name
+						output += this.materials[ name ].map.id + ".png\n";
+
+					}
+
+				} else {
+
+					// default temporary name
+					output += this.materials[ name ].map.id + ".png\n";
+
+				}
+
+			}
+
+			if ( this.materials[ name ].alphaMap ) {
+
+				output += "map_d ";
+
+				if ( this.materials[ name ].alphaMap.name ) {
+
+					output += this.materials[ name ].alphaMap.name + "\n";
+				
+				}
+				
+				// if used TextureLoader
+				else if ( this.materials[ name ].alphaMap.image && this.materials[ name ].alphaMap.image.src ) {
+
+					// parse filename
+					var filename = this.materials[ name ].alphaMap.image.src.match( ".+/(.+?)([\?#;].*)?$" )
+
+					if ( filename ) {
+
+						// has path ?
+						if ( filename.length > 1 ) {
+
+							output += filename[1] + "\n";
+
+						} else {
+
+							output += filename[0] + "\n";
+
+						}
+
+					} else {
+
+						// default temporary name
+						output += this.materials[ name ].alphaMap.id + ".png\n";
+
+					}
+
+				} else {
+
+					// default temporary name
+					output += this.materials[ name ].alphaMap.id + ".png\n";
+
+				}
+
+			}
+
+			if ( this.materials[ name ].bumpMap ) {
+
+				output += "bump ";
+
+				if ( this.materials[ name ].bumpMap.name ) {
+
+					output += this.materials[ name ].bumpMap.name + "\n";
+				
+				}
+				
+				// if used TextureLoader
+				else if ( this.materials[ name ].bumpMap.image && this.materials[ name ].bumpMap.image.src ) {
+
+					// parse filename
+					var filename = this.materials[ name ].bumpMap.image.src.match( ".+/(.+?)([\?#;].*)?$" )
+
+					if ( filename ) {
+
+						// has path ?
+						if ( filename.length > 1 ) {
+
+							output += filename[1] + "\n";
+
+						} else {
+
+							output += filename[0] + "\n";
+
+						}
+
+					} else {
+
+						// default temporary name
+						output += this.materials[ name ].bumpMap.id + ".png\n";
+
+					}
+
+				} else {
+
+					// default temporary name
+					output += this.materials[ name ].bumpMap.id + ".png\n";
+
+				}
+
+			}
+
+			if ( this.materials[ name ].aoMap ) {
+
+				output += "disp ";
+
+				if ( this.materials[ name ].aoMap.name ) {
+
+					output += this.materials[ name ].aoMap.name + "\n";
+				
+				}
+				
+				// if used TextureLoader
+				else if ( this.materials[ name ].aoMap.image && this.materials[ name ].aoMap.image.src ) {
+
+					// parse filename
+					var filename = this.materials[ name ].aoMap.image.src.match( ".+/(.+?)([\?#;].*)?$" )
+
+					if ( filename ) {
+
+						// has path ?
+						if ( filename.length > 1 ) {
+
+							output += filename[1] + "\n";
+
+						} else {
+
+							output += filename[0] + "\n";
+
+						}
+
+					} else {
+
+						// default temporary name
+						output += this.materials[ name ].aoMap.id + ".png\n";
+
+					}
+
+				} else {
+
+					// default temporary name
+					output += this.materials[ name ].aoMap.id + ".png\n";
+
+				}
+
+			}
+
+			if ( this.materials[ name ].emissiveMap ) {
+
+				output += "map_Ke ";
+
+				if ( this.materials[ name ].emissiveMap.name ) {
+
+					output += this.materials[ name ].emissiveMap.image.name + "\n";
+				
+				}
+				
+				// if used TextureLoader
+				else if ( this.materials[ name ].emissiveMap.image && this.materials[ name ].emissiveMap.image.src ) {
+
+					// parse filename
+					var filename = this.materials[ name ].emissiveMap.image.src.match( ".+/(.+?)([\?#;].*)?$" )
+
+					if ( filename ) {
+
+						// has path ?
+						if ( filename.length > 1 ) {
+
+							output += filename[1] + "\n";
+
+						} else {
+
+							output += filename[0] + "\n";
+
+						}
+
+					} else {
+
+						// default temporary name
+						output += this.materials[ name ].emissiveMap.id + ".png\n";
+
+					}
+
+				} else {
+
+					// default temporary name
+					output += this.materials[ name ].emissiveMap.id + ".png\n";
+
+				}
+
+			}
+
+			output += "newmtl none\n";
+
+		})
 
 		return output;
 
