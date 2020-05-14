@@ -585,9 +585,9 @@ THREE.OBJExporter.prototype = {
 
 			}
 
-			output += "newmtl none\n";
-
 		})
+
+		output += "newmtl none\n";
 
 		return output;
 
