@@ -1,19 +1,28 @@
-## three-three-obj-exporter-t
-
-threejs offical apply OBJExporter.js with npm
-
-## install
-
-`npm i --save three-obj-exporter-t`
-
 ## usage
 
 ```js
 
-import * as THREE from 'three'
-import {OBJExporter} from 'three-obj-exporter-t'
+let exporter = new OBJExporter();
+
+// Single mesh
+let result = exporter.parse(mesh);
+
+```
+
+```js
+
+// All meshes
+let result = exporter.parse(scene);
+
+```
+
+```js
 
 let exporter = new OBJExporter();
-exporter.parse(mesh)
+
+exporter.parse(mesh);
+
+// MTL export ( must be after 'parse()' )
+let mtl = exporter.generate_mtl(mesh);
 
 ```
