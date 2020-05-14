@@ -23,6 +23,6 @@ let exporter = new OBJExporter();
 exporter.parse(mesh);
 
 // MTL export ( must be after 'parse()' )
-let mtl = exporter.generate_mtl(mesh);
+let mtl = exporter.generate_mtl();
 
 ```
