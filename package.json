@@ -1,5 +1,5 @@
 {
-  "name": "three-obj-exporter-t",
+  "name": "three-obj-exporter-u",
   "version": "1.0.2",
   "homepage": "https://github.com/cs64188/three-obj-exporter",
   "description": "threejs offical apply obj-exporter.js with npm",
@@ -19,8 +19,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cs64188/three-obj-exporter.git"
+    "url": "git+https://github.com/Urushibara/three-obj-exporter.git"
   },
-  "author": "tomyl",
+  "author": "Urushibara",
   "license": "MIT"
 }
